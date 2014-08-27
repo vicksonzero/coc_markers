@@ -4,35 +4,35 @@
         "zz": 10000,
         "canDrawRange": 1,
         "towers": {
-            "cannon": {
+            "158": {
                 name: "cannon",
                 size: 3,
                 ranges: [9]
             },
-            "archertower": {
+            "159": {
                 name: "archertower",
                 size: 3,
                 ranges: [10]
             },
-            "airdefense": {
+            "161": {
                 name: "airdefense",
                 size: 3,
                 ranges: [10]
             },
-            "wizardtower": {
+            "162": {
                 name: "wizardtower",
                 size: 3,
                 ranges: [7]
             },
-            "tesla": {
+            "163": {
                 name: "tesla",
                 size: 2,
                 ranges: [7]
             },
-            "inferno_tower": {
+            "165": {
                 name: "inferno_tower",
                 size: 2,
-                ranges: [10]
+                ranges: [9]
             },
             "188": {
                 name: "clancastle",
@@ -42,12 +42,12 @@
             "164": {
                 name: "xbow",
                 size: 3,
-                ranges: [11, 14]
+                ranges: [{radius:11,color:"white"}, {radius:14,color:"red"}]
             },
             "160": {
                 name: "mortar",
                 size: 3,
-                ranges: [11, 4]
+                ranges: [{radius:11,color:"white"}, {radius:4,color:"red"}]
             },
             "185": {
                 name: "king",
@@ -56,6 +56,26 @@
             },
             "186": {
                 name: "queen",
+                size: 3,
+                ranges: [10]
+            },
+            "170": {
+                name: "giant_bomb",
+                size: 3,
+                ranges: [{radius:11,color:"white"}, {radius:4,color:"red"}]
+            },
+            "168": {
+                name: "bomb",
+                size: 3,
+                ranges: [{radius:11,color:"white"}, {radius:4,color:"red"}]
+            },
+            "172": {
+                name: "seeking_air_mine",
+                size: 3,
+                ranges: [9]
+            },
+            "171": {
+                name: "air_bomb",
                 size: 3,
                 ranges: [10]
             }
@@ -77,13 +97,12 @@
         $(".object").mouseenter(create_range_markers);
 
         function large_comment() {
-            $(document).keypress(function(e) { /*console.log(e.which);*/
+            $(document).keypress(function(e) { 
                 if (e.which == 82 || e.which == 114) { /*R and r*/
                     com.vickson.coc.canDrawRange = 0;
                     $(".range_marker").remove();
                 }
             }).keyup(function(e) {
-                console.log(e.which);
                 if (e.which == 82 || e.which == 114) { /*R and r*/
                     com.vickson.coc.canDrawRange = 1;
                 }
@@ -92,36 +111,45 @@
     }
 
     function create_range_markers() {
-            $(".range_marker").remove();
-            if (!document.coc_marker_enabled) config.canDrawRange = false;
-            if (!config.canDrawRange) return;
+        $(".range_marker").remove();
+        if (!document.coc_marker_enabled) config.canDrawRange = false;
+        if (!config.canDrawRange) return;
 
-            var n = $(this).attr("id").split('-')[0];
-            if (!config.towers.hasOwnProperty(n)) return;
+        var n = $(this).attr("id").split('-')[0];
+        if (!config.towers.hasOwnProperty(n)) return;
 
-            var
-                r,
-                rngs = config.towers[n].ranges,
-                size = config.towers[n].size;
-            for (var i = 0; i < ranges.length; ++i) {
+        var
+            r,c,
+            rngs = config.towers[n].ranges,
+            size = config.towers[n].size;
+        for (var i = 0; i < rngs.length; ++i) {
+            if(rngs[i] instanceof Number){
                 r = rngs[i] * 20;
-                draw_circle({
-                    size: size,
-                    r: r
-                });
-                /*$(this).css("z-index", com.vickson.coc.zz);
-                com.vickson.coc.zz++;*/
+                c = "white";
+            }else{
+                r = rngs[i].radius * 20;
+                c = rngs[i].color;
             }
-            var tower_icon = draw_tower();
-            $(tower_icon).mouseleave(function() {
-                $('.range_marker').remove();
-                $('.range_marker2').remove();
+            draw_circle({
+                parent:this,
+                size: size,
+                r: r,
+                color:c
             });
+            $(this).css("z-index", config.zz);
+            config.zz++;
         }
-        /*draw_circle({size:3,r:10,opacity:0.3,color:"#FFFFFF"})*/
-
+        draw_tower(this);
+        $('.range_marker2').mouseleave(function() {
+            $('.range_marker').remove();
+            $('.range_marker2').remove();
+        });
+    }
+    
+    /*draw_circle({size:3,r:10,opacity:0.3,color:"#FFFFFF"})*/
     function draw_circle(params) {
         var param_def = {
+            parent:null,
             size: 3,
             r: 10,
             opacity: 0.3,
@@ -132,14 +160,14 @@
                 params[attrname] = param_def[attrname];
             }
         }
-        $(this).append("" +
+        $(params.parent).append("" +
             "<div class='range_marker' " +
             "style='position:absolute;" +
             "display:block;" +
             "width: " + (params.r * 2) + "px;" +
             "height: " + (params.r * 2) + "px;" +
-            "margin-left: " + (-1 * params.r + params.size) + "px;" +
-            "margin-top: " + (-1 * params.r + params.size) + "px;" +
+            "margin-left: " + (-1 * params.r + params.size*10) + "px;" +
+            "margin-top: " + (-1 * params.r + params.size*10) + "px;" +
             "-mozborder-radius: " + (params.r) + "px;" +
             "-webkit-border-radius: " + (params.r) + "px;" +
             "border-radius: " + (params.r) + "px;" +
@@ -148,13 +176,17 @@
             "</div> ");
     }
 
+            
 
-
-    function draw_tower() {
-        return $(this).append("" +
+    function draw_tower(parent) {
+        $(parent).append("" +
             "<div class='range_marker2' " +
             "style='position:absolute;" +
-            "display:block;" + "width: " + $(this).css('width') + ";" + "height: " + $(this).css('height') + ";" + "left: " + 0 + ";" + "top: " + 0 + ";" + "background-image: " + $(this).css('backgroundImage') +
+            "display:block;" + "width: " + $(parent).css('width') + ";" 
+            + "height: " + $(parent).css('height') + ";" + 
+            "left: " + 0 + ";" + 
+            "top: " + 0 + ";" + 
+            "background-image: " + $(parent).css('backgroundImage') +
             "; '>" + "</div> ");
     }
 
