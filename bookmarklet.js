@@ -42,7 +42,7 @@
             "164": {
                 name: "xbow",
                 size: 3,
-                ranges: [{radius:11,color:"white"}, {radius:14,color:"red"}]
+                ranges: [{radius:11,color:"DeepSkyBlue"}, {radius:14,color:"white"}]
             },
             "160": {
                 name: "mortar",
@@ -60,24 +60,24 @@
                 ranges: [10]
             },
             "170": {
-                name: "giant_bomb",
-                size: 3,
-                ranges: [{radius:11,color:"white"}, {radius:4,color:"red"}]
+                name: "giant_bomb_lv3",
+                size: 2,
+                ranges: [{radius:2,color:"white"}, {radius:3.5,color:"red"}]
             },
             "168": {
                 name: "bomb",
-                size: 3,
-                ranges: [{radius:11,color:"white"}, {radius:4,color:"red"}]
+                size: 1,
+                ranges: [{radius:1.5,color:"white"}, {radius:3,color:"red"}]
             },
             "172": {
                 name: "seeking_air_mine",
-                size: 3,
-                ranges: [9]
+                size: 1,
+                ranges: [4]
             },
             "171": {
                 name: "air_bomb",
-                size: 3,
-                ranges: [10]
+                size: 1,
+                ranges: [5]
             }
         }
     };
@@ -118,12 +118,11 @@
         var n = $(this).attr("id").split('-')[0];
         if (!config.towers.hasOwnProperty(n)) return;
 
-        var
-            r,c,
+        var r,c,
             rngs = config.towers[n].ranges,
             size = config.towers[n].size;
         for (var i = 0; i < rngs.length; ++i) {
-            if(rngs[i] instanceof Number){
+            if(! isNaN(rngs[i])){
                 r = rngs[i] * 20;
                 c = "white";
             }else{
