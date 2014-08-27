@@ -89,21 +89,27 @@
 
         }
     }
-    function draw_circle(size,r,opacity,color){
-        var 
+    /*draw_circle({size:3,r:10,opacity:0.3,color:"#FFFFFF"})*/
+    function draw_circle(params){
+        var param_def = {size:3,r:10,opacity:0.3,color:"#FFFFFF"};
+        for (var attrname in param_def) { 
+            if(!params.hasOwnProperty(attrname)){
+                params[attrname] = param_def[attrname];
+            }
+        }
         $(this).append("" + 
             "<div class='range_marker' " + 
             "style='position:absolute;" + 
             "display:block;" + 
-            "width: " + (r * 2) + "px;" + 
-            "height: " + (r * 2) + "px;" + 
-            "margin-left: " + (-1 * r + size + "px;" + 
-            "margin-top: " + (-1 * r + size + "px;" + 
-            "-mozborder-radius: " + (r) + "px;" + 
-            "-webkit-border-radius: " + (r) + "px;" + 
-            "border-radius: " + (r) + "px;" + 
-            "opacity:"+opacity+";" + 
-            "background-color:"+color+"; '>" + 
+            "width: " + (params.r * 2) + "px;" + 
+            "height: " + (params.r * 2) + "px;" + 
+            "margin-left: " + (-1 * params.r + params.size + "px;" + 
+            "margin-top: " + (-1 * params.r + params.size + "px;" + 
+            "-mozborder-radius: " + (params.r) + "px;" + 
+            "-webkit-border-radius: " + (params.r) + "px;" + 
+            "border-radius: " + (params.r) + "px;" + 
+            "opacity:"+params.opacity+";" + 
+            "background-color:"+params.color+"; '>" + 
             "</div> ");
 
     }
