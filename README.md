@@ -10,7 +10,7 @@ bookmarklet for http://clashofclansbuilder.com/
 2. copy the whole source code to clipboard
 3. create a new bookmark and edit it
 4. paste the source to the address field
-5. delete the very first `//` symbols
+5. delete the very first 2 symbols `//` to uncomment the `javascript:` keywords
 6. save the bookmark
 
 ## How to Use
