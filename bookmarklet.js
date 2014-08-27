@@ -88,6 +88,7 @@
     } else {
 
         document.coc_marker_enabled = true;
+        create_menu();
         bind_range_markers();
         alert("marker added");
 
@@ -139,10 +140,10 @@
             config.zz++;
         }
         draw_tower(this);
-        $('.range_marker2').mouseleave(function() {
+        /*$('.range_marker2').mouseleave(function() {
             $('.range_marker').remove();
             $('.range_marker2').remove();
-        });
+        });*/
     }
     
     /*draw_circle({size:3,r:10,opacity:0.3,color:"#FFFFFF"})*/
@@ -161,7 +162,8 @@
         }
         $(params.parent).append("" +
             "<div class='range_marker' " +
-            "style='position:absolute;" +
+            "style='pointer-events:none;"+
+            "position:absolute;" +
             "display:block;" +
             "width: " + (params.r * 2) + "px;" +
             "height: " + (params.r * 2) + "px;" +
@@ -169,13 +171,14 @@
             "margin-top: " + (-1 * params.r + params.size*10) + "px;" +
             "-mozborder-radius: " + (params.r) + "px;" +
             "-webkit-border-radius: " + (params.r) + "px;" +
-            "border-radius: " + (params.r) + "px;" +
+            "border-radius: " + (params.r) + "px;" +/*
+            "border-color: " + params.color +";" +
+            "border-style: solid;" +
+            "border-width: 0.5px;" +*/
             "opacity:" + params.opacity + ";" +
             "background-color:" + params.color + "; '>" +
             "</div> ");
     }
-
-            
 
     function draw_tower(parent) {
         $(parent).append("" +
@@ -187,6 +190,10 @@
             "top: " + 0 + ";" + 
             "background-image: " + $(parent).css('backgroundImage') +
             "; '>" + "</div> ");
+    }
+
+    function create_menu(){
+        var div = document.createElement("div");
     }
 
 })();
