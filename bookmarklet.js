@@ -1,8 +1,10 @@
 //javascript:
 (function() {
+	/*edit this object to configure script*/
 	var config = {
 		"zz": 10000,
 		"showRange": 1,
+		"sidebarSize":40,
 		"towers": {
 			"158": {
 				name: "cannon",
@@ -82,16 +84,66 @@
 		}
 	};
 
+	/* do not edit beyond this comment*/
+	var state = {
+		"sidebarDrag":"none"
+	};
+
 	if (document.hasOwnProperty("coc_marker_enabled")) {
 		document.coc_marker_enabled = !document.coc_marker_enabled;
 		alert("marker is " + (document.coc_marker_enabled ? "en" : "dis") + "abled");
 	} else {
 
 		document.coc_marker_enabled = true;
+		inject_css();
 		create_menu();
 		bind_range_markers();
 		alert("marker added");
 
+	}
+
+	function inject_css(){
+		$("<style type='text/css'> 
+			.coc_marker{
+				-webkit-touch-callout: none;
+				-webkit-user-select: none;
+				-khtml-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+			}
+			.coc_marker.ui_container{
+				position:fixed;
+				top:0; left:0;
+			}
+			.coc_marker.ui_hidden{
+				display:none;
+			}
+			.coc_marker.ui_sidebar_tower{
+				width:" + config.sidebarSize +"px;
+				height:" + config.sidebarSize +"px;
+				box-sizing:border-box;
+				background-size:100%;
+			}
+			.coc_marker.ui_sidebar_show_button,
+			.coc_marker.ui_sidebar_hide_button{
+				background-color:#333;
+				color:white;
+			}
+			.coc_marker.object_highlight{
+				box-shadow:inset 0px 0px 8pt 3pt #ff0;
+			}
+			.coc_marker.object_over_highlight{
+				box-shadow:inset 0px 0px 8pt 3pt #fff;
+			}
+			.coc_marker.ui_highlight{
+				box-shadow:inset 0px 0px 8pt 3pt #ff0;
+			}
+			.coc_marker.ui_over_highlight{
+				box-shadow:inset 0px 0px 8pt 3pt #fff;
+			}
+
+		</style>").appendTo("head");
 	}
 
 	function bind_range_markers() {
@@ -107,13 +159,12 @@
 			});
 	}
 
-	function create_range_markers(me) {
-		$(me).find(".range_marker").remove();
-		$(me).find(".tower_icon").remove();
+	function create_range_markers(base_elem) {
+		if($(base_elem).find(".coc_marker.range_marker").length) return;
 		if (!document.coc_marker_enabled) config.showRange = false;
 		if (!config.showRange) return;
 
-		var n = $(me).attr("id").split('-')[0];
+		var n = base_elem.id.split('-')[0];
 		if (!config.towers.hasOwnProperty(n)) return;
 
 		var r,c,
@@ -128,23 +179,23 @@
 				c = rngs[i].color;
 			}
 			draw_circle({
-				parent:me,
+				parent:base_elem,
 				size: size,
 				r: r,
 				color:c
 			});
-			$(me).css("z-index", config.zz);
+			$(base_elem).css("z-index", config.zz);
 			config.zz++;
 		}
-		draw_tower(me);
+		draw_tower(base_elem);
 	}
 
 	function remove_range_markers_if_needed(me){
 
 		var data = $(me).data();
 		if(!data.hasOwnProperty("showMarker") || !data.showMarker){
-			$(me).find('.range_marker').remove();
-			$(me).find('.tower_icon').remove();
+			$(me).find('.coc_marker.range_marker').remove();
+			$(me).find('.coc_marker.tower_icon').remove();
 		}
 	}
 
@@ -152,10 +203,10 @@
 		var data = $(me).data();
 		if(data.showMarker){
 			data.showMarker=0;
-			$(me).find('.tower_icon').add(me).css("box-shadow","none");
+			$(me).find('.tower_icon').add(me).removeClass("object_highlight");
 		}else{
 			data.showMarker=1;
-			$(me).find('.tower_icon').add(me).css("box-shadow", "inset 0px 0px 8pt 3pt #ff0");
+			$(me).find('.tower_icon').add(me).addClass("object_highlight");
 		}
 	}
 	
@@ -165,13 +216,13 @@
 			parent:null,
 			size: 3,
 			r: 10,
-			opacity: 0.3,
+			opacity: 0.2,
 			color: "#FFFFFF"
 		};
 		project_default(params,param_def);
 
 		$(params.parent).append("" +
-			"<div class='range_marker' " +
+			"<div class='coc_marker range_marker' " +
 			"style='pointer-events:none;"+
 			"position:absolute;" +
 			"display:block;" +
@@ -192,7 +243,7 @@
 
 	function draw_tower(parent) {
 		$(parent).append("" +
-			"<div class='tower_icon' " +
+			"<div class='coc_marker tower_icon' " +
 			"style='position:absolute;" +
 			"display:block;" + "width: " + $(parent).css('width') + ";" + 
 			"height: " + $(parent).css('height') + ";" + 
@@ -212,7 +263,120 @@
 	}
 
 	function create_menu(){
-		var div = document.createElement("div");
+		var $container = $("<div>", {class: "coc_marker ui_container"});
+		var $sidebar_show_button = $("<div>", {class: "coc_marker ui_sidebar_show_button ui_hidden"});
+		$sidebar_show_button.html("<<");
+		$container.append($sidebar_show_button);
+
+		var $sidebar = $("<div>", {class: "coc_marker ui_sidebar"});
+		var $sidebar_hide_button = $("<div>", {class: "coc_marker ui_sidebar_hide_button"});
+		$sidebar_hide_button.html(">>");
+		$sidebar.append($sidebar_hide_button);
+
+		var $buttons = prepare_tower_buttons();
+		$sidebar.append($buttons);
+
+		$container.append($sidebar);
+		$("body").append($container);
+
+		function prepare_tower_buttons(){
+			gather_backgrounds();
+			var $button,
+				t = config.towers,
+				$result = $("<div>", {class: "coc_marker ui_sidebar_towers_container"});
+			for(var i in t){
+				$button = $("<div>", {class: "coc_marker ui_sidebar_tower"}).css("background-image",t[i].bg);
+				t[i].show=0;
+				t[i].index=i;
+				$button.data().tower = t[i];
+
+				$button
+					.mousedown(function(evt){
+						if($(evt.target).data().tower.show){
+							hide_all_markers_of(evt.target);
+						}else{
+							show_all_markers_of(evt.target);
+						}
+						state.sidebarDrag = $(evt.target).data().tower.show?"show":"hide";
+					})
+					.mouseenter(function(evt){
+						if(state.sidebarDrag == "show"){
+							show_all_markers_of(evt.target);
+						}else if(state.sidebarDrag == "hide"){
+							hide_all_markers_of(evt.target);
+						}else if(state.sidebarDrag == "none"){
+							$(evt.target).addClass("ui_over_highlight");
+							highlight_all_of(evt.target);
+						}
+					})
+					.mouseleave(function(evt){
+						$(evt.target).removeClass("ui_over_highlight");
+						unhighlight_all_of(evt.target);
+					})
+					.mouseup(function(){
+						state.sidebarDrag="none";
+					});
+				$(window)
+					.mouseup(function(){
+						state.sidebarDrag="none";
+					});
+				$result.append($button);
+			}
+			return $result;
+
+			function gather_backgrounds(){
+				var t = config.towers;
+				$('.object').each(function(){
+					var n = this.id.split('-')[0];
+					if (t.hasOwnProperty(n)) {
+						t[n].bg = $(this).css('backgroundImage');
+					}
+				});
+			}
+			function hide_all_markers_of(target,isTemporary){
+				var d = $(target).data().tower;
+				d.show = 0;
+				$(target).removeClass('ui_highlight');
+				$('.object').each(function(){
+					var n = this.id.split('-')[0];
+					if (n == d.index) {
+						$(this).data().showMarker=0;
+						remove_range_markers_if_needed(this);
+					}
+				});
+			}
+			function show_all_markers_of(target,isTemporary){
+				var d = $(target).data().tower;
+				d.show = 1;
+				$(target).addClass('ui_highlight');
+				$('.object').each(function(){
+					var n = this.id.split('-')[0];
+					if (n == d.index) {
+						$(this).data().showMarker=1;
+						create_range_markers(this);
+					}
+				});
+			}
+			function highlight_all_of(target){
+				var d = $(target).data().tower;
+				$('.object').each(function(){
+					var n = this.id.split('-')[0];
+					if (n == d.index) {
+						$(this).addClass("coc_marker object_over_highlight");
+					}
+				});
+			}
+			function unhighlight_all_of(target){
+				var d = $(target).data().tower;
+				$('.object').each(function(){
+					var n = this.id.split('-')[0];
+					if (n == d.index) {
+						$(this).removeClass("coc_marker object_over_highlight");
+					}
+				});
+			}
+		}
+
 	}
 
 })();
