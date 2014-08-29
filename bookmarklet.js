@@ -4,7 +4,7 @@
 	var config = {
 		"zz": 10000,
 		"showRange": 1,
-		"sidebarSize":40,
+		"sidebarSize":36,
 		"towers": {
 			"158": {
 				name: "cannon",
@@ -115,20 +115,32 @@
 			.coc_marker.ui_container{
 				position:fixed;
 				top:0; left:0;
+				background-color:#333;
+				max-height:100%;
+				overflow:auto;
 			}
 			.coc_marker.ui_hidden{
 				display:none;
 			}
+			.coc_marker.ui_sidebar{
+				margin-bottom:" + config.sidebarSize + "px;
+				/*margin-right:30px;*/
+			}
 			.coc_marker.ui_sidebar_tower{
-				width:" + config.sidebarSize +"px;
-				height:" + config.sidebarSize +"px;
+				width:" + config.sidebarSize + "px;
+				height:" + config.sidebarSize + "px;
 				box-sizing:border-box;
 				background-size:100%;
 			}
 			.coc_marker.ui_sidebar_show_button,
 			.coc_marker.ui_sidebar_hide_button{
-				background-color:#333;
 				color:white;
+			}
+			.coc_marker.ui_control a{
+				color:white;
+			}
+			.coc_marker.ui_control a:hover{
+				text-decoration:underline;
 			}
 			.coc_marker.object_highlight{
 				box-shadow:inset 0px 0px 8pt 3pt #ff0;
@@ -264,20 +276,40 @@
 
 	function create_menu(){
 		var $container = $("<div>", {class: "coc_marker ui_container"});
+		/*show button*/
 		var $sidebar_show_button = $("<div>", {class: "coc_marker ui_sidebar_show_button ui_hidden"});
-		$sidebar_show_button.html("<<");
+		$sidebar_show_button.html("show").click(function(){
+			$('.ui_sidebar').show();
+			$('.ui_sidebar_show_button').hide();
+		});
 		$container.append($sidebar_show_button);
-
+		/*sidebar*/
 		var $sidebar = $("<div>", {class: "coc_marker ui_sidebar"});
 		var $sidebar_hide_button = $("<div>", {class: "coc_marker ui_sidebar_hide_button"});
-		$sidebar_hide_button.html(">>");
+		$sidebar_hide_button.html("hide").click(function(){
+			$('.ui_sidebar_show_button').show();
+			$('.ui_sidebar').hide();
+		});
 		$sidebar.append($sidebar_hide_button);
 
 		var $buttons = prepare_tower_buttons();
 		$sidebar.append($buttons);
 
+		var $controls = $("<div>", {class: "coc_marker ui_control"});
+		$controls.html("
+			<a href='javascript:void(0)'>Reverse</a><br>
+			<a href='javascript:void(0)'>Disable</a><br>
+			<a href='javascript:void(0)'>Config</a><br>
+			<a href='javascript:void(0)'>Remove</a><br>
+		");
+		$sidebar.append($controls);
+		
+
+		/*final*/
 		$container.append($sidebar);
 		$("body").append($container);
+
+		/* ===== create_menu() private functions START ===== */
 
 		function prepare_tower_buttons(){
 			gather_backgrounds();
@@ -376,6 +408,8 @@
 				});
 			}
 		}
+
+		/* ===== create_menu() private functions END ===== */
 
 	}
 
