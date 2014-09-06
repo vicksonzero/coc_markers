@@ -5,6 +5,7 @@
 		"zz": 10000,
 		"showRange": 1,
 		"sidebarSize":36,
+		"bgOpacity":"0.3",
 		"towers": {
 			"158": {
 				name: "cannon",
@@ -44,12 +45,18 @@
 			"164": {
 				name: "xbow",
 				size: 3,
-				ranges: [{radius:11,color:"DeepSkyBlue"}, {radius:14,color:"white"}]
+				ranges: [
+					{radius:11,color:"rgba(0,191,255,0.3)",border:"rgba(0,191,255,1)"}, 
+					{radius:14,color:"rgba(255,255,255,0.3)",border:"rgba(255,255,255,1)"}
+				]
 			},
 			"160": {
 				name: "mortar",
 				size: 3,
-				ranges: [{radius:11,color:"white"}, {radius:4,color:"red"}]
+				ranges: [
+					{radius:11,color:"rgba(255,255,255,0.3)",border:"rgba(255,255,255,1)"}, 
+					{radius:4,color:"rgba(255,0,0,0.3)",border:"rgba(255,0,0,1)"}
+				]
 			},
 			"185": {
 				name: "king",
@@ -64,12 +71,18 @@
 			"170": {
 				name: "giant_bomb_lv3",
 				size: 2,
-				ranges: [{radius:2,color:"white"}, {radius:3.5,color:"red"}]
+				ranges: [
+					{radius:2,color:"rgba(255,255,255,0.3)",border:"rgba(255,255,255,1)"}, 
+					{radius:3.5,color:"rgba(255,0,0,0.3)",border:"rgba(255,0,0,1)"}
+				]
 			},
 			"168": {
 				name: "bomb",
 				size: 1,
-				ranges: [{radius:1.5,color:"white"}, {radius:3,color:"red"}]
+				ranges: [
+					{radius:1.5,color:"rgba(255,255,255,0.3)",border:"rgba(255,255,255,1)"}, 
+					{radius:3,color:"rgba(255,0,0,0.3)",border:"rgba(255,0,0,1)"}
+				]
 			},
 			"172": {
 				name: "seeking_air_mine",
@@ -179,22 +192,25 @@
 		var n = base_elem.id.split('-')[0];
 		if (!config.towers.hasOwnProperty(n)) return;
 
-		var r,c,
+		var r,c,bc,
 			rngs = config.towers[n].ranges,
 			size = config.towers[n].size;
 		for (var i = 0; i < rngs.length; ++i) {
 			if(! isNaN(rngs[i])){
 				r = rngs[i] * 20;
-				c = "white";
+				c = "rgba(255,255,255,"+config.bgOpacity+")";
+				bc= "rgba(255,255,255,1)"
 			}else{
 				r = rngs[i].radius * 20;
 				c = rngs[i].color;
+				bc= rngs[i].border;
 			}
 			draw_circle({
 				parent:base_elem,
 				size: size,
 				r: r,
-				color:c
+				color:c,
+				border:bc
 			});
 			$(base_elem).css("z-index", config.zz);
 			config.zz++;
@@ -228,14 +244,14 @@
 			parent:null,
 			size: 3,
 			r: 10,
-			opacity: 0.2,
-			color: "#FFFFFF"
+			color: "rgba(255,255,255,"+config.bgOpacity+")",
+			border: "rgba(255,255,255,1)"
 		};
 		project_default(params,param_def);
 
 		$(params.parent).append("" +
-			"<div class='coc_marker range_marker' " +
-			"style='pointer-events:none;"+
+			"<div class='coc_marker range_marker' style=' "+
+			"pointer-events:none;"+
 			"position:absolute;" +
 			"display:block;" +
 			"width: " + (params.r * 2) + "px;" +
@@ -244,13 +260,12 @@
 			"margin-top: " + (-1 * params.r + params.size*10) + "px;" +
 			"-mozborder-radius: " + (params.r) + "px;" +
 			"-webkit-border-radius: " + (params.r) + "px;" +
-			"border-radius: " + (params.r) + "px;" +/*
-			"border-color: " + params.color +";" +
+			"border-radius: " + (params.r) + "px;" +
+			"background-color:" + params.color + ";" +
+			"border-color: " + params.border +";" +
 			"border-style: solid;" +
-			"border-width: 0.5px;" +*/
-			"opacity:" + params.opacity + ";" +
-			"background-color:" + params.color + "; '>" +
-			"</div> ");
+			"border-width: 1px;" +
+			" '></div> ");
 	}
 
 	function draw_tower(parent) {
@@ -262,8 +277,8 @@
 			"left: " + 0 + ";" + 
 			"top: " + 0 + ";" + 
 			"pointer-events:none;" +
-			"background-image: " + $(parent).css('backgroundImage') +
-			"; '>" + "</div> ");
+			"background-image: " + $(parent).css('backgroundImage') +";"+
+			" '>" + "</div> ");
 	}
 
 	function project_default(target,default_obj){
