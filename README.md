@@ -1,7 +1,9 @@
-coc_markers
+coc_markers(discontinued)
 ===========
 
 bookmarklet for http://clashofclansbuilder.com/
+
+__Is now discontinued due to large update in their site__
 
 
 ##How to Install
@@ -15,7 +17,7 @@ bookmarklet for http://clashofclansbuilder.com/
 
 ## How to Use
 
-1. go to http://clashofclansbuilder.com/
+1. go to an older version of http://clashofclansbuilder.com/
 2. open a coc plan
 3. click the bookmark to activate `coc_marker`
 4. mouse over the towers to see their range
